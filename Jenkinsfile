@@ -8,7 +8,7 @@ pipeline {
     stage('Checkout Code') {
       steps {
         echo 'Pulling from Github'
-        git branch: 'main', credentialsId: 'Git-cred', url: 'https://github.com/Tpawar25/JENKINS_PROJECT.git'
+        git branch: 'main', credentialsId: 'Git-cred', url: 'https://github.com/Tpawar25/k8Testjenkin.git'
       }
     }
     stage('Test Code') {
@@ -37,17 +37,33 @@ pipeline {
         bat 'docker build -t myjavaproj:1.0 .'
       }
     }
+    stage('Push Docker Image to Docker Hub') {
+          steps {
+            echo 'Pushing Docker Image'
+           withCredentials([string(credentialsId: 'docker-cred1', variable: 'DOCKER_PASS')]) {
+            bat '''
 
-    stage('Run Docker Container') {
-      steps {
-        echo 'Running Java Application'
-        bat '''
-        docker rm -f myjavaproj-container || exit 0
-        docker run --name myjavaproj-container myjavaproj:1.0
+           echo %DOCKER_PASS% | docker login -u Tpawar02 --password-stdin
+           docker tag myjavaproj:01 Tpawar02/myindiaproj:1.0
+           docker push Tpawar02/myindiaproj:1.0
 
-        '''
-      }
-    }
+            '''
+           }
+
+          }
+        }
+
+
+//     stage('Run Docker Container') {
+//       steps {
+//         echo 'Running Java Application'
+//         bat '''
+//         docker rm -f myjavaproj-container || exit 0
+//         docker run --name myjavaproj-container myjavaproj:1.0
+//
+//         '''
+//       }
+//     }
   }
   post {
     success {
